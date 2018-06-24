@@ -19,15 +19,26 @@ public class MusicProvider extends ContentProvider {
 
     private static final String AUTHORITY = "com.elegion.roomdatabase.musicprovider";
     private static final String TABLE_ALBUM = "album";
+    private static final String TABLE_SONG = "song";
+    private static final String TABLE_ALBUM_SONG ="albumsong" ;
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
     private static final int ALBUM_TABLE_CODE = 100;
     private static final int ALBUM_ROW_CODE = 101;
 
+    private static final int SONG_TABLE_CODE = 200;
+    private static final int SONG_ROW_CODE = 201;
+
+    private static final int ALBUM_SONG_TABLE_CODE = 300;
+    private static final int ALBUM_SONG_ROW_CODE = 301;
     static {
         URI_MATCHER.addURI(AUTHORITY, TABLE_ALBUM, ALBUM_TABLE_CODE);
         URI_MATCHER.addURI(AUTHORITY, TABLE_ALBUM + "/*", ALBUM_ROW_CODE);
+        URI_MATCHER.addURI(AUTHORITY, TABLE_SONG, SONG_TABLE_CODE);
+        URI_MATCHER.addURI(AUTHORITY, TABLE_SONG + "/*", SONG_ROW_CODE);
+        URI_MATCHER.addURI(AUTHORITY, TABLE_ALBUM_SONG, SONG_TABLE_CODE);
+        URI_MATCHER.addURI(AUTHORITY, TABLE_SONG + "/*", SONG_ROW_CODE);
     }
 
     private MusicDao mMusicDao;
@@ -54,6 +65,14 @@ public class MusicProvider extends ContentProvider {
                 return "vnd.android.cursor.dir/" + AUTHORITY + "." + TABLE_ALBUM;
             case ALBUM_ROW_CODE:
                 return "vnd.android.cursor.item/" + AUTHORITY + "." + TABLE_ALBUM;
+            case SONG_TABLE_CODE:
+                return "vnd.android.cursor.dir/" + AUTHORITY + "." + TABLE_SONG;
+            case SONG_ROW_CODE:
+                return "vnd.android.cursor.item/" + AUTHORITY + "." + TABLE_SONG;
+            case ALBUM_SONG_TABLE_CODE:
+                return "vnd.android.cursor.dir/" + AUTHORITY + "." + TABLE_ALBUM_SONG;
+            case ALBUM_SONG_ROW_CODE:
+                return "vnd.android.cursor.item/" + AUTHORITY + "." + TABLE_ALBUM_SONG;
             default:
                 throw new UnsupportedOperationException("not yet implemented");
         }
@@ -65,15 +84,30 @@ public class MusicProvider extends ContentProvider {
 
         int code = URI_MATCHER.match(uri);
 
-        if (code != ALBUM_ROW_CODE && code != ALBUM_TABLE_CODE) return null;
+        if (code != ALBUM_ROW_CODE && code != ALBUM_TABLE_CODE  &&
+                code != SONG_ROW_CODE && code != SONG_TABLE_CODE  &&
+                code != ALBUM_SONG_ROW_CODE && code != ALBUM_SONG_TABLE_CODE) return null;
 
-        Cursor cursor;
+        Cursor cursor = null;
 
         if (code == ALBUM_TABLE_CODE) {
             cursor = mMusicDao.getAlbumsCursor();
-        } else {
+        } else if (code == ALBUM_ROW_CODE) {
             cursor = mMusicDao.getAlbumWithIdCursor((int) ContentUris.parseId(uri));
         }
+
+        if (code == SONG_TABLE_CODE) {
+            cursor = mMusicDao.getSongsCursor();
+        } else if (code == SONG_ROW_CODE) {
+            cursor = mMusicDao.getSongWithIdCursor((int) ContentUris.parseId(uri));
+        }
+
+        if (code == ALBUM_SONG_TABLE_CODE) {
+            cursor = mMusicDao.getAlbumSongsCursor();
+        } else if (code == ALBUM_SONG_ROW_CODE) {
+            cursor = mMusicDao.getAlbumSongWithIdCursor((int) ContentUris.parseId(uri));
+        }
+
         return cursor;
     }
 

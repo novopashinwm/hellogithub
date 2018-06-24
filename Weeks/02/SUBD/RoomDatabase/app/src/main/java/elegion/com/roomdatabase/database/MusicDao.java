@@ -82,6 +82,12 @@ public interface MusicDao {
     @Update
     int updateAlbumInfo(Album album);
 
+    @Update
+    int updateSongInfo(Song song);
+
+    @Update
+    int updateAlbumSongInfo(AlbumSong albumSong);
+
     //удалить альбом по id
     @Query("DELETE FROM album where id = :albumId")
     int deleteAlbumById(int albumId);

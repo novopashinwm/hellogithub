@@ -50,6 +50,12 @@ public interface MusicDao {
     @Query("select * from song")
     List<Song> getSongs();
 
+    @Query("select * from song")
+    Cursor getSongCursor();
+
+    @Query("select * from song where id = :songId")
+    Cursor getSongWithIdCursor(int songId);
+
     @Delete
     void deleteAlbum(Album album);
 

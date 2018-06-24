@@ -65,7 +65,7 @@ public class Album {
     }
 
     public static List<Album> createAlbums() {
-        List<Album> albums = new ArrayList<>(3);
+        List<Album> albums = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             albums.add(new Album(i, "album " + i, "release" + System.currentTimeMillis()));
         }

@@ -68,6 +68,15 @@ public interface MusicDao {
     @Delete
     void deleteAlbum(Album album);
 
+    @Query("delete from album")
+    void deleteAlbumAll();
+
+    @Query("delete from song")
+    void deleteSongAll();
+
+    @Query("delete from albumsong")
+    void deleteAlbumSongAll();
+
     @Delete
     void deleteSong(Song song);
 

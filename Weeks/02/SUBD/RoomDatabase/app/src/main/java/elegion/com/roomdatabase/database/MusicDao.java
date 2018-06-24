@@ -92,4 +92,10 @@ public interface MusicDao {
     @Query("DELETE FROM album where id = :albumId")
     int deleteAlbumById(int albumId);
 
+    //удалить песню по id
+    @Query("DELETE FROM song where id = :songId")
+    int deleteSongById(int songId);
+
+    @Query("DELETE from albumsong where id = :albumSongId")
+    int deleteAlbumSongById(int albumSongId);
 }

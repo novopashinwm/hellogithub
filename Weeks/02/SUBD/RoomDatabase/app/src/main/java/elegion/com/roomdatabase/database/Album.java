@@ -4,6 +4,9 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Azret Magometov
  */
@@ -60,4 +63,13 @@ public class Album {
                 ", mName='" + mName +
                 ", mReleaseDate='" + mReleaseDate + '}';
     }
+
+    public static List<Album> createAlbums() {
+        List<Album> albums = new ArrayList<>(3);
+        for (int i = 0; i < 3; i++) {
+            albums.add(new Album(i, "album " + i, "release" + System.currentTimeMillis()));
+        }
+        return albums;
+    }
+
 }

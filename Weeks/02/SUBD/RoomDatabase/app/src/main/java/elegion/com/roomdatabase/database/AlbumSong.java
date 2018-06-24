@@ -5,6 +5,9 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Azret Magometov
  */
@@ -55,5 +58,13 @@ public class AlbumSong {
 
     public void setSongId(int songId) {
         mSongId = songId;
+    }
+
+    public static List<AlbumSong> createAlbumSongs() {
+        List<AlbumSong> albumSongs = new ArrayList<>(3);
+        for (int i = 0; i < 3; i++) {
+            albumSongs.add(new AlbumSong(i,  i, i));
+        }
+        return albumSongs;
     }
 }

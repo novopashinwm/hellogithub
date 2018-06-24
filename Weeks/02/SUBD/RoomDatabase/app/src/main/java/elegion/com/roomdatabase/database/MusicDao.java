@@ -68,6 +68,12 @@ public interface MusicDao {
     @Delete
     void deleteAlbum(Album album);
 
+    @Delete
+    void deleteSong(Song song);
+
+    @Delete
+    void  deleteAlbumSong(AlbumSong albumSong);
+
     //получить список песен переданного id альбома
     @Query("select * from song inner join albumsong on song.id = albumsong.song_id where album_id = :albumId")
     List<Song> getSongsFromAlbum(int albumId);

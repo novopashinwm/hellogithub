@@ -180,16 +180,44 @@ public class MusicProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         if (URI_MATCHER.match(uri) == ALBUM_ROW_CODE && isAlbumValuesValid(values)) {
-            Album album = new Album();
-            int id = (int) ContentUris.parseId(uri);
-            album.setId(id);
-            album.setName(values.getAsString("name"));
-            album.setReleaseDate(values.getAsString("release"));
-            return  mMusicDao.updateAlbumInfo(album);
-        } else {
+            return updateAlbum(uri, values);
+        } else if (URI_MATCHER.match(uri) == SONG_ROW_CODE && isSongValuesValid(values)) {
+            return updateSong(uri, values);
+        } else if (URI_MATCHER.match(uri) == ALBUM_SONG_ROW_CODE && isAlbumSongValuesValid(values)) {
+            return updateAlbumSong(uri, values);
+        }
+        else {
             throw new IllegalArgumentException("cant add multiple items");
         }
 
+    }
+
+    private int updateAlbumSong(Uri uri, ContentValues values) {
+        AlbumSong albumSong = new AlbumSong();
+        int id = (int) ContentUris.parseId(uri);
+        albumSong.setId(id);
+        albumSong.setAlbumId(values.getAsInteger("albumId"));
+        albumSong.setSongId(values.getAsInteger("songId"));
+        mMusicDao.insertAlbumSong(albumSong);
+        return  id;
+    }
+
+    private int updateSong(@NonNull  Uri uri, ContentValues values) {
+        Song song = new Song();
+        int id = (int) ContentUris.parseId(uri);
+        song.setId(id);
+        song.setName(values.getAsString("name"));
+        song.setDuration(values.getAsString("duration"));
+        return mMusicDao.updateSongInfo(song);
+    }
+
+    private int updateAlbum(@NonNull Uri uri, ContentValues values) {
+        Album album = new Album();
+        int id = (int) ContentUris.parseId(uri);
+        album.setId(id);
+        album.setName(values.getAsString("name"));
+        album.setReleaseDate(values.getAsString("release"));
+        return  mMusicDao.updateAlbumInfo(album);
     }
 
     @Override

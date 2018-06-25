@@ -225,9 +225,14 @@ public class MusicProvider extends ContentProvider {
         if (URI_MATCHER.match(uri) == ALBUM_ROW_CODE) {
             int id = (int) ContentUris.parseId(uri);
             return mMusicDao.deleteAlbumById(id);
+        } else if (URI_MATCHER.match(uri) == SONG_ROW_CODE) {
+            int id = (int) ContentUris.parseId(uri);
+            return mMusicDao.deleteSongById(id);
+        } else if (URI_MATCHER.match(uri) == ALBUM_SONG_ROW_CODE) {
+            int id = (int) ContentUris.parseId(uri);
+            return mMusicDao.deleteAlbumSongById(id);
         } else {
             throw new IllegalArgumentException("cant add multiple items");
         }
-
     }
 }

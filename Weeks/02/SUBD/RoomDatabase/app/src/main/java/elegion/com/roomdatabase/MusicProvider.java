@@ -10,8 +10,10 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import elegion.com.roomdatabase.database.Album;
+import elegion.com.roomdatabase.database.AlbumSong;
 import elegion.com.roomdatabase.database.MusicDao;
 import elegion.com.roomdatabase.database.MusicDatabase;
+import elegion.com.roomdatabase.database.Song;
 
 public class MusicProvider extends ContentProvider {
 
@@ -59,7 +61,7 @@ public class MusicProvider extends ContentProvider {
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         switch (URI_MATCHER.match(uri)) {
             case ALBUM_TABLE_CODE:
                 return "vnd.android.cursor.dir/" + AUTHORITY + "." + TABLE_ALBUM;
@@ -79,14 +81,15 @@ public class MusicProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection,
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
         int code = URI_MATCHER.match(uri);
 
         if (code != ALBUM_ROW_CODE && code != ALBUM_TABLE_CODE  &&
                 code != SONG_ROW_CODE && code != SONG_TABLE_CODE  &&
-                code != ALBUM_SONG_ROW_CODE && code != ALBUM_SONG_TABLE_CODE) return null;
+                code != ALBUM_SONG_ROW_CODE && code != ALBUM_SONG_TABLE_CODE)
+            return null;
 
         Cursor cursor = null;
 
@@ -113,33 +116,76 @@ public class MusicProvider extends ContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
-        if (URI_MATCHER.match(uri) == ALBUM_TABLE_CODE && isValuesValid(values)) {
-            Album album = new Album();
-            Integer id = values.getAsInteger("id");
-            album.setId(id);
-            album.setName(values.getAsString("name"));
-            album.setReleaseDate(values.getAsString("release"));
-            mMusicDao.insertAlbum(album);
+        Integer id;
+        if (URI_MATCHER.match(uri) == ALBUM_TABLE_CODE && isAlbumValuesValid(values)) {
+            id = insertAlbumID(values);
             return ContentUris.withAppendedId(uri, id);
-        } else {
+        } else if (URI_MATCHER.match(uri) == SONG_TABLE_CODE && isSongValuesValid(values)) {
+            id = insertSongID(values);
+            return ContentUris.withAppendedId(uri, id);
+        }
+         else if (URI_MATCHER.match(uri) == ALBUM_SONG_TABLE_CODE && isAlbumSongValuesValid(values)) {
+            id = insertAlbumSongID(values);
+            return ContentUris.withAppendedId(uri, id);
+        }
+        else {
             throw new IllegalArgumentException("cant add multiple items");
         }
     }
 
-    private boolean isValuesValid(ContentValues values) {
+    private Integer insertAlbumSongID(ContentValues values) {
+        AlbumSong albumSong = new AlbumSong();
+        Integer id = values.getAsInteger("id");
+        albumSong.setId(id);
+        albumSong.setAlbumId(values.getAsInteger("albumId"));
+        albumSong.setSongId(values.getAsInteger("songId"));
+        mMusicDao.insertAlbumSong(albumSong);
+        return id;
+    }
+
+    private boolean isAlbumSongValuesValid(ContentValues values) {
+        return values.containsKey("id") && values.containsKey("albumId")
+                && values.containsKey("songId");
+    }
+
+    private Integer insertSongID(ContentValues values) {
+        Song song = new Song();
+        Integer id = values.getAsInteger("id");
+        song.setId(id);
+        song.setName(values.getAsString("name"));
+        song.setDuration(values.getAsString("duration"));
+        mMusicDao.insertSong(song);
+        return id;
+    }
+
+    private boolean isSongValuesValid(ContentValues values) {
+        return values.containsKey("id") && values.containsKey("name") && values.containsKey("duration");
+    }
+
+    @NonNull
+    private Integer insertAlbumID(ContentValues values) {
+        Album album = new Album();
+        Integer id = values.getAsInteger("id");
+        album.setId(id);
+        album.setName(values.getAsString("name"));
+        album.setReleaseDate(values.getAsString("release"));
+        mMusicDao.insertAlbum(album);
+        return id;
+    }
+
+    private boolean isAlbumValuesValid(ContentValues values) {
         return values.containsKey("id") && values.containsKey("name") && values.containsKey("release");
     }
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        if (URI_MATCHER.match(uri) == ALBUM_ROW_CODE && isValuesValid(values)) {
+        if (URI_MATCHER.match(uri) == ALBUM_ROW_CODE && isAlbumValuesValid(values)) {
             Album album = new Album();
             int id = (int) ContentUris.parseId(uri);
             album.setId(id);
             album.setName(values.getAsString("name"));
             album.setReleaseDate(values.getAsString("release"));
-            int updatedRows = mMusicDao.updateAlbumInfo(album);
-            return updatedRows;
+            return  mMusicDao.updateAlbumInfo(album);
         } else {
             throw new IllegalArgumentException("cant add multiple items");
         }
@@ -147,7 +193,7 @@ public class MusicProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         if (URI_MATCHER.match(uri) == ALBUM_ROW_CODE) {
             int id = (int) ContentUris.parseId(uri);
             return mMusicDao.deleteAlbumById(id);

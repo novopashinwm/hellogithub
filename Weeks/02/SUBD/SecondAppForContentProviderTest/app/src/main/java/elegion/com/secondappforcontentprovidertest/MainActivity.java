@@ -9,9 +9,30 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    Spinner spinnerMusicType;
+    Spinner spinnerQuery;
+    EditText editText;
+
+    Button btnRun;
+    private View.OnClickListener mbtnRunClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (editText.getText().toString().isEmpty()) {
+                if (spinnerQuery.getSelectedItem().toString().equals("update")
+                        || spinnerQuery.getSelectedItem().toString().equals("delete")) {
+                    Toast.makeText(getApplicationContext(), "Для данного типа запроса нужен id"
+                            , Toast.LENGTH_LONG ).show();
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +51,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
 
         getSupportLoaderManager().initLoader(12, null, this);
+        initControls();
 
+    }
 
+    private void initControls() {
+        spinnerMusicType= findViewById(R.id.music_types_spinner);
+        spinnerQuery = findViewById(R.id.query_types_spinner);
+        editText = findViewById(R.id.edit_text);
+        btnRun = findViewById(R.id.btnRun);
+        btnRun.setOnClickListener(mbtnRunClickListener);
     }
 
     @Override

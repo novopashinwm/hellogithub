@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">SecondAppForContentProviderTest</string>
+    <string name="enter_id_item">Enter id item</string>
+    <string name="run_text">Выполнить</string>
     <string-array name="music_types">
         <item>Albums</item>
         <item>Songs</item>

@@ -34,9 +34,7 @@ public class MainActivity extends AppCompatActivity {
         mAddBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                musicDao.deleteAlbumAll();
-                musicDao.deleteSongAll();
-                musicDao.deleteAlbumSongAll();
+
                 musicDao.insertAlbums(Album.createAlbums());
                 musicDao.insertSongs(Song.createSongs());
                 musicDao.insertAlbumSongs(AlbumSong.createAlbumSongs());

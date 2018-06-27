@@ -92,11 +92,10 @@ public class MusicProvider extends ContentProvider {
             return null;
 
         Cursor cursor = null;
-
-        if (code == ALBUM_TABLE_CODE) {
-            cursor = mMusicDao.getAlbumsCursor();
-        } else if (code == ALBUM_ROW_CODE) {
-            cursor = mMusicDao.getAlbumWithIdCursor((int) ContentUris.parseId(uri));
+        if (code == ALBUM_SONG_TABLE_CODE) {
+            cursor = mMusicDao.getAlbumSongsCursor();
+        } else if (code == ALBUM_SONG_ROW_CODE) {
+            cursor = mMusicDao.getAlbumSongWithIdCursor((int) ContentUris.parseId(uri));
         }
 
         else if (code == SONG_TABLE_CODE) {
@@ -105,11 +104,13 @@ public class MusicProvider extends ContentProvider {
             cursor = mMusicDao.getSongWithIdCursor((int) ContentUris.parseId(uri));
         }
 
-        else if (code == ALBUM_SONG_TABLE_CODE) {
-            cursor = mMusicDao.getAlbumSongsCursor();
-        } else if (code == ALBUM_SONG_ROW_CODE) {
-            cursor = mMusicDao.getAlbumSongWithIdCursor((int) ContentUris.parseId(uri));
+        else
+        if (code == ALBUM_TABLE_CODE) {
+            cursor = mMusicDao.getAlbumsCursor();
+        } else if (code == ALBUM_ROW_CODE) {
+            cursor = mMusicDao.getAlbumWithIdCursor((int) ContentUris.parseId(uri));
         }
+
 
         return cursor;
     }

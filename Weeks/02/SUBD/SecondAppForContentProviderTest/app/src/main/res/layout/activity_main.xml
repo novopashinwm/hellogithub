@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -30,12 +30,28 @@
 
     <EditText
         android:id="@+id/edit_text"
+        android:hint="@string/id_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />
     <Button
         android:id="@+id/btnRun"
         android:text="@string/run_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/etItem1"
+        android:hint="id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/etItem2"
+        android:hint="name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/etItem3"
+        android:hint="realease date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

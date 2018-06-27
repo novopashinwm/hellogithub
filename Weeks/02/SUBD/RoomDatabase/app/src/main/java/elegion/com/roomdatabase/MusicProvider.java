@@ -99,13 +99,13 @@ public class MusicProvider extends ContentProvider {
             cursor = mMusicDao.getAlbumWithIdCursor((int) ContentUris.parseId(uri));
         }
 
-        if (code == SONG_TABLE_CODE) {
+        else if (code == SONG_TABLE_CODE) {
             cursor = mMusicDao.getSongsCursor();
         } else if (code == SONG_ROW_CODE) {
             cursor = mMusicDao.getSongWithIdCursor((int) ContentUris.parseId(uri));
         }
 
-        if (code == ALBUM_SONG_TABLE_CODE) {
+        else if (code == ALBUM_SONG_TABLE_CODE) {
             cursor = mMusicDao.getAlbumSongsCursor();
         } else if (code == ALBUM_SONG_ROW_CODE) {
             cursor = mMusicDao.getAlbumSongWithIdCursor((int) ContentUris.parseId(uri));

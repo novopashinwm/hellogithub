@@ -8,6 +8,8 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
+import android.widget.Toast;
 
 import elegion.com.roomdatabase.database.Album;
 import elegion.com.roomdatabase.database.AlbumSong;
@@ -39,8 +41,8 @@ public class MusicProvider extends ContentProvider {
         URI_MATCHER.addURI(AUTHORITY, TABLE_ALBUM + "/*", ALBUM_ROW_CODE);
         URI_MATCHER.addURI(AUTHORITY, TABLE_SONG, SONG_TABLE_CODE);
         URI_MATCHER.addURI(AUTHORITY, TABLE_SONG + "/*", SONG_ROW_CODE);
-        URI_MATCHER.addURI(AUTHORITY, TABLE_ALBUM_SONG, SONG_TABLE_CODE);
-        URI_MATCHER.addURI(AUTHORITY, TABLE_SONG + "/*", SONG_ROW_CODE);
+        URI_MATCHER.addURI(AUTHORITY, TABLE_ALBUM_SONG, ALBUM_SONG_TABLE_CODE);
+        URI_MATCHER.addURI(AUTHORITY, TABLE_ALBUM_SONG + "/*", ALBUM_SONG_ROW_CODE);
     }
 
     private MusicDao mMusicDao;
@@ -93,12 +95,14 @@ public class MusicProvider extends ContentProvider {
 
         Cursor cursor = null;
         if (code == ALBUM_SONG_TABLE_CODE) {
+            Log.d(TAG, "query: getAlbumSongsCursor");
             cursor = mMusicDao.getAlbumSongsCursor();
         } else if (code == ALBUM_SONG_ROW_CODE) {
             cursor = mMusicDao.getAlbumSongWithIdCursor((int) ContentUris.parseId(uri));
         }
 
         else if (code == SONG_TABLE_CODE) {
+            Log.d(TAG, "query: getSongsCursor");
             cursor = mMusicDao.getSongsCursor();
         } else if (code == SONG_ROW_CODE) {
             cursor = mMusicDao.getSongWithIdCursor((int) ContentUris.parseId(uri));
@@ -106,6 +110,7 @@ public class MusicProvider extends ContentProvider {
 
         else
         if (code == ALBUM_TABLE_CODE) {
+            Log.d(TAG, "query: getAlbumsCursor");
             cursor = mMusicDao.getAlbumsCursor();
         } else if (code == ALBUM_ROW_CODE) {
             cursor = mMusicDao.getAlbumWithIdCursor((int) ContentUris.parseId(uri));
@@ -223,13 +228,18 @@ public class MusicProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
+        Log.d(TAG, "Enter delete: ");
+        Log.d(TAG, "delete: URI_MATHCER="+URI_MATCHER.match(uri));
         if (URI_MATCHER.match(uri) == ALBUM_ROW_CODE) {
+            Log.d(TAG, "delete: Album");
             int id = (int) ContentUris.parseId(uri);
             return mMusicDao.deleteAlbumById(id);
         } else if (URI_MATCHER.match(uri) == SONG_ROW_CODE) {
+            Log.d(TAG, "delete: Song");
             int id = (int) ContentUris.parseId(uri);
             return mMusicDao.deleteSongById(id);
         } else if (URI_MATCHER.match(uri) == ALBUM_SONG_ROW_CODE) {
+            Log.d(TAG, "delete AlbumSong");
             int id = (int) ContentUris.parseId(uri);
             return mMusicDao.deleteAlbumSongById(id);
         } else {

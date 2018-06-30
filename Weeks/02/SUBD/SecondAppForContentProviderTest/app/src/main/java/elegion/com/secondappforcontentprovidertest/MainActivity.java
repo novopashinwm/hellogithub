@@ -48,40 +48,128 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         public void onClick(View v) {
 
             String queryText = spinnerQuery.getSelectedItem().toString();
-            if (editText.getText().toString().isEmpty()) {
-                switch (queryText){
-                    case "update":
-                    case "delete":
-                        Toast.makeText(getApplicationContext()
-                                , "Для данного типа запроса нужен id записи."
-                                , Toast.LENGTH_LONG).show();
+            switch (queryText){
+                case "update":
+                    if (isEditTextEmptyOrWrong())                        
                         break;
-                    case "query":
-                        showQueryData();
+                    updateData();
+                    Toast.makeText(MainActivity.this, "Запись обновлена!", Toast.LENGTH_SHORT).show();
+                    break;
+                case "delete":
+                    if (isEditTextEmptyOrWrong())
                         break;
-                }
-
+                    deleteData();
+                    Toast.makeText(MainActivity.this, "Запись удалена!", Toast.LENGTH_SHORT).show();
+                    break;
+                case "query":
+                    showQueryData();
+                    break;
+                case "insert":
+                    insertData();
+                    Toast.makeText(MainActivity.this, "Запись добавлена!", Toast.LENGTH_SHORT).show();
+                    break;
             }
         }
     };
 
+    private void updateData() {
+        ContentValues values = new ContentValues();
+        String table = getTablebyMusicType();
+        values.put(getItemName1(),getItemValue1());
+        values.put(getItemName2(),getItemValue2());
+        values.put(getItemName3(),getItemValue3());
+        String sId = editText.getText().toString();
+        String contentString = "content://" + AUTHORITY + "/" + table +"/" +sId;
+        getContentResolver().update(Uri.parse(contentString),values,null,null);
+    }
+
+    private void insertData() {
+        ContentValues values = new ContentValues();
+        String table = getTablebyMusicType();
+        values.put(getItemName1(),getItemValue1());
+        values.put(getItemName2(),getItemValue2());
+        values.put(getItemName3(),getItemValue3());
+        String contentString = "content://" + AUTHORITY + "/" + table ;
+
+        getContentResolver().insert(Uri.parse(contentString),values);
+    }
+
+    private String getItemValue3() {
+        return etItem3.getText().toString();
+    }
+
+    private String getItemName3() {
+        switch (getTablebyMusicType()) {
+            case TABLE_ALBUM: return "release";
+            case TABLE_SONG:  return "duration";
+            case TABLE_ALBUM_SONG: return "songId";
+        }
+        return null;
+    }
+
+    private String getItemValue2() {
+        return etItem2.getText().toString();
+    }
+
+    private String getItemName2() {
+        if (getTablebyMusicType()==TABLE_ALBUM_SONG)
+            return "albumId";
+        return "name";
+    }
+
+    private String getItemValue1() {
+        return etItem1.getText().toString();
+    }
+
+    private String getItemName1() {
+        return "id";
+    }
+
+    private void deleteData() {
+        String table = getTablebyMusicType();
+        String sId = editText.getText().toString();
+        String contentString = "content://" + AUTHORITY + "/" + table + "/"  + sId;
+        getContentResolver().delete(Uri.parse(contentString), null, null);
+    }
+
+    private String getTablebyMusicType() {
+        String table = spinnerMusicType.getSelectedItem().toString();
+        switch (table) {
+            case "Albums": return TABLE_ALBUM;
+            case "Songs": return TABLE_SONG;
+            case "AlbumSongs": return TABLE_ALBUM_SONG;
+        }
+        return null;
+    }
+
+    private boolean isEditTextEmptyOrWrong() {
+        String text =editText.getText().toString();
+        if ( text == null ||text.isEmpty() || ! text.matches("\\d+") ) {
+            Toast.makeText(getApplicationContext()
+                    , "Для данного типа запроса нужен id записи."
+                    , Toast.LENGTH_LONG).show();
+            return  true;
+        }
+        return  false;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void showQueryData() {
         String musicType = spinnerMusicType.getSelectedItem().toString();
-        int id =0;
-        switch (musicType) {
-            case "Albums":
-                id= ALBUM_TABLE_CODE;
-                break;
-            case "Songs":
-                id= SONG_TABLE_CODE;
-                break;
-            case "AlbumSongs":
-                id= ALBUM_SONG_TABLE_CODE;
-                break;
-        }
+        int id = getId(musicType);
+        Bundle bundle = new Bundle();
+        bundle.putString("id", editText.getText().toString());
+        getSupportLoaderManager().restartLoader(id,bundle, this);
+    }
 
-        getSupportLoaderManager().restartLoader(id,null, this);
+    private int getId(String musicType) {
+        int id=0;
+        switch (musicType) {
+            case "Albums":        id= ALBUM_TABLE_CODE;      break;
+            case "Songs":         id= SONG_TABLE_CODE;       break;
+            case "AlbumSongs":    id= ALBUM_SONG_TABLE_CODE; break;
+        }
+        return id;
     }
 
     private AdapterView.OnItemSelectedListener OnItemSelectListener = new AdapterView.OnItemSelectedListener() {
@@ -145,9 +233,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 table = TABLE_ALBUM_SONG;
                 break;
         }
+        String sid = args.getString("id");
+        String contentString = "content://" + AUTHORITY + "/" + table;
+
+        if (sid !=null && !sid.isEmpty())
+            contentString += "/" + sid;
 
         return new CursorLoader(this,
-                Uri.parse("content://"+ AUTHORITY + "/" + table),
+                Uri.parse(contentString),
                 null,
                 null,
                 null,
@@ -158,17 +251,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null && data.moveToFirst()) {
-            int id = loader.getId();
             StringBuilder builder = new StringBuilder();
             do {
-                if (id!= ALBUM_SONG_TABLE_CODE)
-                    builder.append(data.getString(data.getColumnIndex("name"))).append("\n");
-                else {
-                    builder.append(data.getString(data.getColumnIndex("albumId"))).append("\n");
-                    builder.append(data.getString(data.getColumnIndex("songId"))).append("\n");
+                for (int i =0; i< data.getColumnCount(); i++) {
+                    if (i>0)
+                        builder.append(", ");
+                    builder.append(data.getColumnName(i));
+                    builder.append("=");
+                    builder.append(data.getString(i));
                 }
+                builder.append("\n\n");
             } while (data.moveToNext());
             Toast.makeText(this, builder.toString(), Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Ошибка id", Toast.LENGTH_SHORT).show();
         }
 
     }

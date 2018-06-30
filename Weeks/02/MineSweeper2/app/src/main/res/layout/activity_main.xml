@@ -1,0 +1,38 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:stretchColumns="0,2"
+    android:background="@drawable/back"
+    android:layout_height="match_parent"
+     android:layout_width="match_parent">
+    <TableRow>
+        <TextView
+            android:id="@+id/Timer"
+            android:layout_column="0"
+            android:text="000" />
+        <ImageButton android:id="@+id/Smiley"
+            android:layout_column="1"
+            android:background="@drawable/smiley_button_states"
+            android:layout_height="48px"/>
+        <TextView
+            android:id="@+id/MineCount"
+            android:layout_column="2"
+            android:text="000" />
+    </TableRow>
+    <TableRow>
+        <TextView
+            android:layout_column="0"
+            android:layout_height="50px"
+            android:layout_span="3"
+            android:padding="10dip"/>
+    </TableRow>
+    <TableRow>
+        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/MineField"
+            android:layout_width="260px"
+            android:layout_height="260px"
+            android:gravity="bottom"
+            android:stretchColumns="*"
+            android:layout_span="3"
+            android:padding="5dip" >
+        </TableLayout>
+    </TableRow>
+</TableLayout>
